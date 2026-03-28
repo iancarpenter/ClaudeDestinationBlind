@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>London Bus Destination Blind</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚌</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blind-bg: #0a0a0a;
+      --blind-text: #f5f0e8;
+      --route-bg: #111;
+      --via-color: #c8c0b0;
+      --accent: #dc241f;
+      --page-bg: #1a1a1a;
+      --control-bg: #2a2a2a;
+      --control-border: #444;
+      --control-text: #ddd;
+      --btn-hover: #3a3a3a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--page-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Jost', 'Gill Sans', 'Gill Sans MT', system-ui, sans-serif;
+      padding: 2rem 1rem;
+      gap: 2rem;
+    }
+
+    /* ── Page heading ── */
+    .page-title {
+      color: #888;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* ── Blind wrapper ── */
+    .blind-outer {
+      width: min(90vw, 860px);
+      aspect-ratio: 16 / 5;
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #222;
+      cursor: default;
+    }
+
+    /* Classic mode */
+    .blind-outer.mode-classic {
+      background: var(--blind-bg);
+    }
+
+    /* Vignette overlay */
+    .blind-outer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom,
+          rgba(0,0,0,0.55) 0%,
+          transparent 18%,
+          transparent 82%,
+          rgba(0,0,0,0.55) 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Fabric texture (classic only) */
+    .blind-outer.mode-classic::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(255,255,255,0.015) 3px,
+          rgba(255,255,255,0.015) 4px
+        );
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    /* LED mode background */
+    .blind-outer.mode-led {
+      background: #0d0800;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 0 30px rgba(255,140,0,0.08),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #1a1200;
+    }
+
+    /* ── Blind inner layout ── */
+    .blind-inner {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Route number box */
+    .route-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 22%;
+      border-right: 2px solid #2a2a2a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mode-classic .route-box {
+      border-right-color: #2a2a2a;
+    }
+
+    .mode-led .route-box {
+      border-right-color: #1e1200;
+    }
+
+    /* Destination + via area */
+    .dest-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 4%;
+    }
+
+    /* ── Position indicator ── */
+    .position-indicator {
+      position: absolute;
+      bottom: 6px;
+      right: 10px;
+      font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+      color: rgba(255,255,255,0.25);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      z-index: 20;
+      font-family: 'Jost', monospace;
+    }
+
+    .mode-led .position-indicator {
+      color: rgba(255,140,0,0.2);
+    }
+
+    /* ── CLASSIC TEXT ── */
+    .mode-classic .route-number {
+      font-size: clamp(1.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      color: var(--blind-text);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      font-family: 'Jost', 'Gill Sans', system-ui, sans-serif;
+    }
+
+    .mode-classic .destination-text {
+      font-size: clamp(1rem, 4.5vw, 3.4rem);
+      font-weight: 800;
+      color: var(--blind-text);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .mode-classic .via-text {
+      font-size: clamp(0.55rem, 2vw, 1.4rem);
+      font-weight: 400;
+      color: var(--via-color);
+      margin-top: 0.3em;
+      text-align: center;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── LED TEXT ── */
+    .mode-led .route-number {
+      font-size: clamp(1.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      color: #ff8c00;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-shadow:
+        0 0 10px rgba(255,140,0,0.8),
+        0 0 20px rgba(255,140,0,0.4);
+      font-family: 'Jost', monospace;
+    }
+
+    .mode-led .destination-text {
+      font-size: clamp(1rem, 4.5vw, 3.4rem);
+      font-weight: 800;
+      color: #ff8c00;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      text-align: center;
+      text-shadow:
+        0 0 8px rgba(255,140,0,0.9),
+        0 0 20px rgba(255,140,0,0.4);
+    }
+
+    .mode-led .via-text {
+      font-size: clamp(0.55rem, 2vw, 1.4rem);
+      font-weight: 400;
+      color: #cc6600;
+      margin-top: 0.3em;
+      text-align: center;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 6px rgba(255,140,0,0.5);
+    }
+
+    /* ── Slide transition (classic) ── */
+    .slide-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide-frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      will-change: transform, filter;
+    }
+
+    .slide-frame.entering {
+      animation: slideIn 300ms ease-out forwards;
+    }
+    .slide-frame.leaving {
+      animation: slideOut 300ms ease-in forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(100%); filter: blur(2px); opacity: 0.6; }
+      to   { transform: translateY(0);    filter: blur(0);   opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateY(0);     filter: blur(0);   opacity: 1; }
+      to   { transform: translateY(-100%); filter: blur(2px); opacity: 0.6; }
+    }
+
+    /* ── Strobe transition (LED) ── */
+    .slide-frame.led-strobe {
+      animation: ledStrobe 320ms steps(1) forwards;
+    }
+    .slide-frame.led-in {
+      animation: ledIn 320ms steps(1) forwards;
+    }
+
+    @keyframes ledStrobe {
+      0%   { opacity: 1; }
+      33%  { opacity: 0; }
+      66%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes ledIn {
+      0%   { opacity: 0; }
+      33%  { opacity: 0; }
+      55%  { opacity: 1; }
+      70%  { opacity: 0; }
+      85%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    /* ── Route box slide ── */
+    .route-slide-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .route-frame {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .route-frame.entering { animation: slideIn 300ms ease-out forwards; }
+    .route-frame.leaving  { animation: slideOut 300ms ease-in forwards; }
+    .route-frame.led-strobe { animation: ledStrobe 320ms steps(1) forwards; }
+    .route-frame.led-in     { animation: ledIn 320ms steps(1) forwards; }
+
+    /* ── NOT IN SERVICE special style ── */
+    .not-in-service .destination-text {
+      font-size: clamp(0.9rem, 3.5vw, 2.6rem) !important;
+      letter-spacing: 0.12em !important;
+    }
+
+    .mode-classic .not-in-service .destination-text {
+      color: #888 !important;
+    }
+
+    .mode-led .not-in-service .destination-text {
+      color: #774400 !important;
+      text-shadow: none !important;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      color: var(--control-text);
+      font-family: 'Jost', system-ui, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 1.1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 150ms, border-color 150ms, color 150ms;
+      user-select: none;
+    }
+
+    .btn:hover { background: var(--btn-hover); border-color: #666; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-mode {
+      border-color: var(--accent);
+      color: #f88;
+    }
+    .btn-mode:hover { background: #3a1010; border-color: #ff4040; color: #fcc; }
+
+    .btn-nav { font-size: 1.1rem; padding: 0.45rem 0.9rem; }
+
+    .progress-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #444;
+      transition: background 300ms, transform 300ms;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.4);
+    }
+
+    /* ── Aria live ── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      color: #444;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="page-title">London Bus Destination Blind</p>
+
+  <div class="blind-outer mode-classic" id="blindOuter" aria-label="London bus destination blind">
+
+    <div class="blind-inner">
+
+      <!-- Route number -->
+      <div class="route-box">
+        <div class="route-slide-wrapper">
+          <div class="route-frame" id="routeCurrent">
+            <span class="route-number" id="routeNumCurrent"></span>
+          </div>
+          <div class="route-frame" id="routeNext" style="opacity:0">
+            <span class="route-number" id="routeNumNext"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destination + via -->
+      <div class="dest-area">
+        <div class="slide-wrapper">
+          <div class="slide-frame" id="slideCurrent">
+            <span class="destination-text" id="destCurrent"></span>
+            <span class="via-text" id="viaCurrent"></span>
+          </div>
+          <div class="slide-frame" id="slideNext" style="opacity:0">
+            <span class="destination-text" id="destNext"></span>
+            <span class="via-text" id="viaNext"></span>
+          </div>
+        </div>
+        <div class="position-indicator" id="posIndicator"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Accessible live region -->
+  <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-nav" id="btnPrev" title="Previous destination">&#8592;</button>
+    <div class="progress-dots" id="progressDots"></div>
+    <button class="btn btn-nav" id="btnNext" title="Next destination">&#8594;</button>
+    <button class="btn btn-mode" id="btnMode">Switch to LED</button>
+  </div>
+
+  <p class="footer">Hover to pause &nbsp;·&nbsp; &larr; &rarr; to step</p>
+
+  <script>
+    'use strict';
+
+    /* ── Destination data ── */
+    const DESTINATIONS = [
+      { route: '73',   destination: 'VICTORIA COACH STATION', via: 'via Marble Arch, Hyde Park Corner' },
+      { route: '8',    destination: 'BOW CHURCH',             via: 'via Bethnal Green, Stepney Green' },
+      { route: '38',   destination: 'VICTORIA',               via: 'via Piccadilly Circus, Trafalgar Square' },
+      { route: '23',   destination: 'LIVERPOOL STREET',       via: 'via Bank, Moorgate' },
+      { route: '29',   destination: 'TRAFALGAR SQUARE',       via: 'via Finsbury Park, King\'s Cross' },
+      { route: '14',   destination: 'PUTNEY HEATH',           via: 'via Knightsbridge, South Kensington' },
+      { route: '9',    destination: 'ALDWYCH',                via: 'via Kensington, Hammersmith' },
+      { route: '55',   destination: 'OXFORD CIRCUS',          via: 'via Hackney, Islington' },
+      { route: 'N73',  destination: 'STOKE NEWINGTON',        via: 'via Angel, Islington' },
+      { route: 'N29',  destination: 'TRAFALGAR SQUARE',       via: 'via Wood Green, Finsbury Park' },
+      { route: '15',   destination: 'BLACKWALL',              via: 'via Tower Hill, Poplar' },
+      { route: '148',  destination: 'CAMDEN TOWN',            via: 'via Westminster, Waterloo' },
+      { route: '',     destination: 'NOT IN SERVICE',         via: '' },
+    ];
+
+    /* ── State ── */
+    let currentIndex = 0;
+    let isClassic = true;
+    let isAnimating = false;
+    let isPaused = false;
+    let autoTimer = null;
+
+    /* ── DOM refs ── */
+    const blindOuter     = document.getElementById('blindOuter');
+    const routeCurrent   = document.getElementById('routeCurrent');
+    const routeNext      = document.getElementById('routeNext');
+    const routeNumCur    = document.getElementById('routeNumCurrent');
+    const routeNumNxt    = document.getElementById('routeNumNext');
+    const slideCurrent   = document.getElementById('slideCurrent');
+    const slideNext      = document.getElementById('slideNext');
+    const destCurrent    = document.getElementById('destCurrent');
+    const destNext       = document.getElementById('destNext');
+    const viaCurrent     = document.getElementById('viaCurrent');
+    const viaNext        = document.getElementById('viaNext');
+    const posIndicator   = document.getElementById('posIndicator');
+    const liveRegion     = document.getElementById('liveRegion');
+    const btnPrev        = document.getElementById('btnPrev');
+    const btnNext        = document.getElementById('btnNext');
+    const btnMode        = document.getElementById('btnMode');
+    const progressDots   = document.getElementById('progressDots');
+
+    /* ── Render static (no animation) ── */
+    function renderStatic(index) {
+      const d = DESTINATIONS[index];
+      routeNumCur.textContent = d.route;
+      destCurrent.textContent = d.destination;
+      viaCurrent.textContent  = d.via;
+      slideCurrent.classList.toggle('not-in-service', d.route === '');
+      posIndicator.textContent = `${index + 1} / ${DESTINATIONS.length}`;
+      liveRegion.textContent = `Route ${d.route || 'no route'}. ${d.destination}. ${d.via}`;
+      updateDots(index);
+    }
+
+    /* ── Animate to next/prev ── */
+    function animateTo(nextIndex) {
+      if (isAnimating || nextIndex === currentIndex) return;
+      isAnimating = true;
+
+      const d = DESTINATIONS[nextIndex];
+      routeNumNxt.textContent = d.route;
+      destNext.textContent    = d.destination;
+      viaNext.textContent     = d.via;
+      slideNext.classList.toggle('not-in-service', d.route === '');
+
+      const enterClass = isClassic ? 'entering' : 'led-in';
+      const leaveClass = isClassic ? 'leaving'  : 'led-strobe';
+
+      // Make next visible at start position
+      slideNext.style.opacity   = '1';
+      routeNext.style.opacity   = '1';
+
+      // Trigger animations
+      slideCurrent.classList.add(leaveClass);
+      slideNext.classList.add(enterClass);
+      routeCurrent.classList.add(leaveClass);
+      routeNext.classList.add(enterClass);
+
+      const duration = isClassic ? 300 : 340;
+
+      setTimeout(() => {
+        // Swap: current becomes the new one
+        currentIndex = nextIndex;
+
+        routeNumCur.textContent = d.route;
+        destCurrent.textContent = d.destination;
+        viaCurrent.textContent  = d.via;
+        slideCurrent.classList.toggle('not-in-service', d.route === '');
+
+        // Reset next to invisible / clean
+        slideCurrent.classList.remove(leaveClass, enterClass);
+        slideNext.classList.remove(leaveClass, enterClass);
+        routeCurrent.classList.remove(leaveClass, enterClass);
+        routeNext.classList.remove(leaveClass, enterClass);
+
+        slideNext.style.opacity = '0';
+        routeNext.style.opacity = '0';
+
+        posIndicator.textContent = `${currentIndex + 1} / ${DESTINATIONS.length}`;
+        liveRegion.textContent = `Route ${d.route || 'no route'}. ${d.destination}. ${d.via}`;
+        updateDots(currentIndex);
+
+        isAnimating = false;
+      }, duration);
+    }
+
+    function advance()  { animateTo((currentIndex + 1) % DESTINATIONS.length); }
+    function retreat()  { animateTo((currentIndex - 1 + DESTINATIONS.length) % DESTINATIONS.length); }
+
+    /* ── Progress dots ── */
+    function buildDots() {
+      progressDots.innerHTML = '';
+      DESTINATIONS.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+        dot.setAttribute('aria-hidden', 'true');
+        progressDots.appendChild(dot);
+      });
+    }
+
+    function updateDots(index) {
+      const dots = progressDots.querySelectorAll('.dot');
+      dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    }
+
+    /* ── Auto-advance ── */
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => {
+        if (!isPaused) advance();
+      }, 4000);
+    }
+
+    /* ── Mode toggle ── */
+    function setMode(classic) {
+      isClassic = classic;
+      blindOuter.classList.toggle('mode-classic', classic);
+      blindOuter.classList.toggle('mode-led', !classic);
+      btnMode.textContent = classic ? 'Switch to LED' : 'Switch to Classic';
+    }
+
+    /* ── Event listeners ── */
+    btnNext.addEventListener('click', () => { advance(); startAuto(); });
+    btnPrev.addEventListener('click', () => { retreat(); startAuto(); });
+
+    btnMode.addEventListener('click', () => setMode(!isClassic));
+
+    blindOuter.addEventListener('mouseenter', () => { isPaused = true; });
+    blindOuter.addEventListener('mouseleave', () => { isPaused = false; });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { advance(); startAuto(); }
+      if (e.key === 'ArrowLeft')  { retreat(); startAuto(); }
+    });
+
+    /* ── Init ── */
+    buildDots();
+    renderStatic(0);
+    startAuto();
+  </script>
+
+</body>
+</html>
