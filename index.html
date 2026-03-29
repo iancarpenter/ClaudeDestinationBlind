@@ -52,11 +52,17 @@
       gap: 0.75rem;
     }
 
+    /* ── Top row (route number + intermediate stops) ── */
+    .top-row {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
     /* ── Route number box ── */
     .route-number-box {
       width: 25%;
       aspect-ratio: 16 / 8.907;
-      align-self: flex-start;
       position: relative;
       border-radius: 4px;
       overflow: hidden;
@@ -133,6 +139,94 @@
       text-shadow:
         0 0 10px rgba(255,140,0,0.8),
         0 0 20px rgba(255,140,0,0.4);
+    }
+
+    /* ── Intermediate stops container ── */
+    .intermediate-stops {
+      flex: 1;
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #222;
+    }
+
+    .intermediate-stops.mode-classic {
+      background: var(--blind-bg);
+    }
+
+    .intermediate-stops.mode-led {
+      background: #0d0800;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 0 30px rgba(255,140,0,0.08),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #1a1200;
+    }
+
+    /* Vignette on intermediate stops */
+    .intermediate-stops::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom,
+          rgba(0,0,0,0.55) 0%,
+          transparent 18%,
+          transparent 82%,
+          rgba(0,0,0,0.55) 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Fabric texture (classic only) */
+    .intermediate-stops.mode-classic::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(255,255,255,0.015) 3px,
+          rgba(255,255,255,0.015) 4px
+        );
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    .stops-list {
+      position: relative;
+      z-index: 12;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      padding: 0 4%;
+      gap: 0.15em;
+      width: 100%;
+    }
+
+    .stop-item {
+      font-family: 'Jost', 'Gill Sans', system-ui, sans-serif;
+      font-size: clamp(0.4rem, 1.1vw, 0.8rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .intermediate-stops.mode-classic .stop-item {
+      color: var(--blind-text);
+    }
+
+    .intermediate-stops.mode-led .stop-item {
+      color: #ff8c00;
+      text-shadow: 0 0 8px rgba(255,140,0,0.7);
     }
 
     /* ── Blind wrapper ── */
@@ -435,9 +529,23 @@
 
   <div class="blind-stack">
 
-    <div class="route-number-box mode-classic" id="routeNumberBox" aria-label="Route 19">
-      <span class="static-route-number">19</span>
-    </div>
+    <div class="top-row">
+
+      <div class="route-number-box mode-classic" id="routeNumberBox" aria-label="Route 19">
+        <span class="static-route-number">19</span>
+      </div>
+
+      <div class="intermediate-stops mode-classic" id="intermediateStops" aria-label="Intermediate stops">
+        <ul class="stops-list">
+          <li class="stop-item">Finsbury Park</li>
+          <li class="stop-item">Highbury &amp; Islington</li>
+          <li class="stop-item">Angel</li>
+          <li class="stop-item">King's Cross</li>
+          <li class="stop-item">Euston</li>
+        </ul>
+      </div>
+
+    </div><!-- /.top-row -->
 
   <div class="blind-outer mode-classic" id="blindOuter" aria-label="London bus destination blind">
 
@@ -503,8 +611,9 @@
     let isAnimating = false;
 
     /* ── DOM refs ── */
-    const blindOuter       = document.getElementById('blindOuter');
-    const routeNumberBox   = document.getElementById('routeNumberBox');
+    const blindOuter          = document.getElementById('blindOuter');
+    const routeNumberBox      = document.getElementById('routeNumberBox');
+    const intermediateStops   = document.getElementById('intermediateStops');
     const slideCurrent   = document.getElementById('slideCurrent');
     const slideNext      = document.getElementById('slideNext');
     const destCurrent    = document.getElementById('destCurrent');
@@ -599,6 +708,8 @@
       blindOuter.classList.toggle('mode-led', !classic);
       routeNumberBox.classList.toggle('mode-classic', classic);
       routeNumberBox.classList.toggle('mode-led', !classic);
+      intermediateStops.classList.toggle('mode-classic', classic);
+      intermediateStops.classList.toggle('mode-led', !classic);
       btnMode.textContent = classic ? 'Switch to LED' : 'Switch to Classic';
     }
 
