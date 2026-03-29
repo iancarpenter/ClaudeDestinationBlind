@@ -44,9 +44,99 @@
       text-transform: uppercase;
     }
 
+    /* ── Blind stack (route number box + destination blind) ── */
+    .blind-stack {
+      width: min(90vw, 860px);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* ── Route number box ── */
+    .route-number-box {
+      width: 100%;
+      aspect-ratio: 16 / 1.67;
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #222;
+    }
+
+    .mode-classic .route-number-box {
+      background: var(--blind-bg);
+    }
+
+    .mode-led .route-number-box {
+      background: #0d0800;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.8),
+        0 0 30px rgba(255,140,0,0.08),
+        0 2px 8px rgba(0,0,0,0.6),
+        inset 0 0 0 2px #1a1200;
+    }
+
+    /* Vignette on route number box */
+    .route-number-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom,
+          rgba(0,0,0,0.55) 0%,
+          transparent 18%,
+          transparent 82%,
+          rgba(0,0,0,0.55) 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Fabric texture (classic only) */
+    .mode-classic .route-number-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(255,255,255,0.015) 3px,
+          rgba(255,255,255,0.015) 4px
+        );
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    .static-route-number {
+      position: relative;
+      z-index: 12;
+      font-family: 'Jost', 'Gill Sans', system-ui, sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.5rem, 5vw, 4rem);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .mode-classic .static-route-number {
+      color: var(--blind-text);
+    }
+
+    .mode-led .static-route-number {
+      color: #ff8c00;
+      text-shadow:
+        0 0 10px rgba(255,140,0,0.8),
+        0 0 20px rgba(255,140,0,0.4);
+    }
+
     /* ── Blind wrapper ── */
     .blind-outer {
-      width: min(90vw, 860px);
+      width: 100%;
       aspect-ratio: 16 / 5;
       position: relative;
       border-radius: 4px;
@@ -342,6 +432,12 @@
 
   <p class="page-title">London Bus Destination Blind</p>
 
+  <div class="blind-stack">
+
+    <div class="route-number-box mode-classic" id="routeNumberBox" aria-label="Route 19">
+      <span class="static-route-number">19</span>
+    </div>
+
   <div class="blind-outer mode-classic" id="blindOuter" aria-label="London bus destination blind">
 
     <div class="blind-inner">
@@ -364,6 +460,8 @@
     </div>
 
   </div>
+
+  </div><!-- /.blind-stack -->
 
   <!-- Accessible live region -->
   <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
@@ -406,7 +504,8 @@
     let autoTimer = null;
 
     /* ── DOM refs ── */
-    const blindOuter     = document.getElementById('blindOuter');
+    const blindOuter       = document.getElementById('blindOuter');
+    const routeNumberBox   = document.getElementById('routeNumberBox');
     const slideCurrent   = document.getElementById('slideCurrent');
     const slideNext      = document.getElementById('slideNext');
     const destCurrent    = document.getElementById('destCurrent');
@@ -507,6 +606,8 @@
       isClassic = classic;
       blindOuter.classList.toggle('mode-classic', classic);
       blindOuter.classList.toggle('mode-led', !classic);
+      routeNumberBox.classList.toggle('mode-classic', classic);
+      routeNumberBox.classList.toggle('mode-led', !classic);
       btnMode.textContent = classic ? 'Switch to LED' : 'Switch to Classic';
     }
 
