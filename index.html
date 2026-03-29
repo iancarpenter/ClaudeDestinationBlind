@@ -44,9 +44,18 @@
       text-transform: uppercase;
     }
 
+    /* ── Main wrapper (blind stack + controls side by side) ── */
+    .main-wrapper {
+      width: min(90vw, 860px);
+      display: flex;
+      flex-direction: row;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
     /* ── Blind stack (route number box + destination blind) ── */
     .blind-stack {
-      width: min(90vw, 860px);
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
@@ -453,9 +462,9 @@
     /* ── Controls ── */
     .controls {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 0.75rem;
-      flex-wrap: wrap;
       justify-content: center;
     }
 
@@ -487,6 +496,7 @@
 
     .progress-dots {
       display: flex;
+      flex-direction: column;
       gap: 5px;
       align-items: center;
     }
@@ -526,6 +536,8 @@
   </style>
 </head>
 <body>
+
+  <div class="main-wrapper">
 
   <div class="blind-stack">
 
@@ -572,18 +584,20 @@
 
   </div><!-- /.blind-stack -->
 
-  <!-- Accessible live region -->
-  <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
-
   <!-- Controls -->
   <div class="controls">
-    <button class="btn btn-nav" id="btnPrev" title="Previous destination">&#8592;</button>
+    <button class="btn btn-nav" id="btnPrev" title="Previous destination">&#8593;</button>
     <div class="progress-dots" id="progressDots"></div>
-    <button class="btn btn-nav" id="btnNext" title="Next destination">&#8594;</button>
+    <button class="btn btn-nav" id="btnNext" title="Next destination">&#8595;</button>
     <button class="btn btn-mode" id="btnMode">Switch to LED</button>
   </div>
 
-  <p class="footer">&larr; &rarr; to step</p>
+  </div><!-- /.main-wrapper -->
+
+  <!-- Accessible live region -->
+  <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
+
+  <p class="footer">&#8593; &#8595; to step</p>
 
   <script>
     'use strict';
