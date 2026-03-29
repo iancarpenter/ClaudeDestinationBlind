@@ -475,7 +475,7 @@
     <button class="btn btn-mode" id="btnMode">Switch to LED</button>
   </div>
 
-  <p class="footer">Hover to pause &nbsp;·&nbsp; &larr; &rarr; to step</p>
+  <p class="footer">&larr; &rarr; to step</p>
 
   <script>
     'use strict';
@@ -501,8 +501,6 @@
     let currentIndex = 0;
     let isClassic = true;
     let isAnimating = false;
-    let isPaused = false;
-    let autoTimer = null;
 
     /* ── DOM refs ── */
     const blindOuter       = document.getElementById('blindOuter');
@@ -594,14 +592,6 @@
       dots.forEach((d, i) => d.classList.toggle('active', i === index));
     }
 
-    /* ── Auto-advance ── */
-    function startAuto() {
-      clearInterval(autoTimer);
-      autoTimer = setInterval(() => {
-        if (!isPaused) advance();
-      }, 4000);
-    }
-
     /* ── Mode toggle ── */
     function setMode(classic) {
       isClassic = classic;
@@ -613,23 +603,19 @@
     }
 
     /* ── Event listeners ── */
-    btnNext.addEventListener('click', () => { advance(); startAuto(); });
-    btnPrev.addEventListener('click', () => { retreat(); startAuto(); });
+    btnNext.addEventListener('click', () => { advance(); });
+    btnPrev.addEventListener('click', () => { retreat(); });
 
     btnMode.addEventListener('click', () => setMode(!isClassic));
 
-    blindOuter.addEventListener('mouseenter', () => { isPaused = true; });
-    blindOuter.addEventListener('mouseleave', () => { isPaused = false; });
-
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { advance(); startAuto(); }
-      if (e.key === 'ArrowLeft')  { retreat(); startAuto(); }
+      if (e.key === 'ArrowRight') { advance(); }
+      if (e.key === 'ArrowLeft')  { retreat(); }
     });
 
     /* ── Init ── */
     buildDots();
     renderStatic(0);
-    startAuto();
   </script>
 
 </body>
