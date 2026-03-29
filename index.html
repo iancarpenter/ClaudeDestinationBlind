@@ -15,7 +15,6 @@
     :root {
       --blind-bg: #0a0a0a;
       --blind-text: #f5f0e8;
-      --route-bg: #111;
       --via-color: #c8c0b0;
       --accent: #dc241f;
       --page-bg: #1a1a1a;
@@ -115,26 +114,6 @@
       z-index: 5;
     }
 
-    /* Route number box */
-    .route-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      width: 22%;
-      border-right: 2px solid #2a2a2a;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .mode-classic .route-box {
-      border-right-color: #2a2a2a;
-    }
-
-    .mode-led .route-box {
-      border-right-color: #1e1200;
-    }
-
     /* Destination + via area */
     .dest-area {
       flex: 1;
@@ -165,15 +144,6 @@
     }
 
     /* ── CLASSIC TEXT ── */
-    .mode-classic .route-number {
-      font-size: clamp(1.8rem, 7vw, 5.5rem);
-      font-weight: 900;
-      color: var(--blind-text);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      font-family: 'Jost', 'Gill Sans', system-ui, sans-serif;
-    }
-
     .mode-classic .destination-text {
       font-size: clamp(1rem, 4.5vw, 3.4rem);
       font-weight: 800;
@@ -194,18 +164,6 @@
     }
 
     /* ── LED TEXT ── */
-    .mode-led .route-number {
-      font-size: clamp(1.8rem, 7vw, 5.5rem);
-      font-weight: 900;
-      color: #ff8c00;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      text-shadow:
-        0 0 10px rgba(255,140,0,0.8),
-        0 0 20px rgba(255,140,0,0.4);
-      font-family: 'Jost', monospace;
-    }
-
     .mode-led .destination-text {
       font-size: clamp(1rem, 4.5vw, 3.4rem);
       font-weight: 800;
@@ -289,31 +247,6 @@
       85%  { opacity: 1; }
       100% { opacity: 1; }
     }
-
-    /* ── Route box slide ── */
-    .route-slide-wrapper {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .route-frame {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-    }
-
-    .route-frame.entering { animation: slideIn 300ms ease-out forwards; }
-    .route-frame.leaving  { animation: slideOut 300ms ease-in forwards; }
-    .route-frame.led-strobe { animation: ledStrobe 320ms steps(1) forwards; }
-    .route-frame.led-in     { animation: ledIn 320ms steps(1) forwards; }
 
     /* ── NOT IN SERVICE special style ── */
     .not-in-service .destination-text {
@@ -413,18 +346,6 @@
 
     <div class="blind-inner">
 
-      <!-- Route number -->
-      <div class="route-box">
-        <div class="route-slide-wrapper">
-          <div class="route-frame" id="routeCurrent">
-            <span class="route-number" id="routeNumCurrent"></span>
-          </div>
-          <div class="route-frame" id="routeNext" style="opacity:0">
-            <span class="route-number" id="routeNumNext"></span>
-          </div>
-        </div>
-      </div>
-
       <!-- Destination + via -->
       <div class="dest-area">
         <div class="slide-wrapper">
@@ -462,19 +383,19 @@
 
     /* ── Destination data ── */
     const DESTINATIONS = [
-      { route: '73',   destination: 'VICTORIA COACH STATION', via: 'via Marble Arch, Hyde Park Corner' },
-      { route: '8',    destination: 'BOW CHURCH',             via: 'via Bethnal Green, Stepney Green' },
-      { route: '38',   destination: 'VICTORIA',               via: 'via Piccadilly Circus, Trafalgar Square' },
-      { route: '23',   destination: 'LIVERPOOL STREET',       via: 'via Bank, Moorgate' },
-      { route: '29',   destination: 'TRAFALGAR SQUARE',       via: 'via Finsbury Park, King\'s Cross' },
-      { route: '14',   destination: 'PUTNEY HEATH',           via: 'via Knightsbridge, South Kensington' },
-      { route: '9',    destination: 'ALDWYCH',                via: 'via Kensington, Hammersmith' },
-      { route: '55',   destination: 'OXFORD CIRCUS',          via: 'via Hackney, Islington' },
-      { route: 'N73',  destination: 'STOKE NEWINGTON',        via: 'via Angel, Islington' },
-      { route: 'N29',  destination: 'TRAFALGAR SQUARE',       via: 'via Wood Green, Finsbury Park' },
-      { route: '15',   destination: 'BLACKWALL',              via: 'via Tower Hill, Poplar' },
-      { route: '148',  destination: 'CAMDEN TOWN',            via: 'via Westminster, Waterloo' },
-      { route: '',     destination: 'NOT IN SERVICE',         via: '' },
+      { destination: 'VICTORIA COACH STATION', via: 'via Marble Arch, Hyde Park Corner' },
+      { destination: 'BOW CHURCH',             via: 'via Bethnal Green, Stepney Green' },
+      { destination: 'VICTORIA',               via: 'via Piccadilly Circus, Trafalgar Square' },
+      { destination: 'LIVERPOOL STREET',       via: 'via Bank, Moorgate' },
+      { destination: 'TRAFALGAR SQUARE',       via: 'via Finsbury Park, King\'s Cross' },
+      { destination: 'PUTNEY HEATH',           via: 'via Knightsbridge, South Kensington' },
+      { destination: 'ALDWYCH',                via: 'via Kensington, Hammersmith' },
+      { destination: 'OXFORD CIRCUS',          via: 'via Hackney, Islington' },
+      { destination: 'STOKE NEWINGTON',        via: 'via Angel, Islington' },
+      { destination: 'TRAFALGAR SQUARE',       via: 'via Wood Green, Finsbury Park' },
+      { destination: 'BLACKWALL',              via: 'via Tower Hill, Poplar' },
+      { destination: 'CAMDEN TOWN',            via: 'via Westminster, Waterloo' },
+      { destination: 'NOT IN SERVICE',         via: '' },
     ];
 
     /* ── State ── */
@@ -486,10 +407,6 @@
 
     /* ── DOM refs ── */
     const blindOuter     = document.getElementById('blindOuter');
-    const routeCurrent   = document.getElementById('routeCurrent');
-    const routeNext      = document.getElementById('routeNext');
-    const routeNumCur    = document.getElementById('routeNumCurrent');
-    const routeNumNxt    = document.getElementById('routeNumNext');
     const slideCurrent   = document.getElementById('slideCurrent');
     const slideNext      = document.getElementById('slideNext');
     const destCurrent    = document.getElementById('destCurrent');
@@ -506,12 +423,11 @@
     /* ── Render static (no animation) ── */
     function renderStatic(index) {
       const d = DESTINATIONS[index];
-      routeNumCur.textContent = d.route;
       destCurrent.textContent = d.destination;
       viaCurrent.textContent  = d.via;
-      slideCurrent.classList.toggle('not-in-service', d.route === '');
+      slideCurrent.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
       posIndicator.textContent = `${index + 1} / ${DESTINATIONS.length}`;
-      liveRegion.textContent = `Route ${d.route || 'no route'}. ${d.destination}. ${d.via}`;
+      liveRegion.textContent = `${d.destination}. ${d.via}`;
       updateDots(index);
     }
 
@@ -521,23 +437,19 @@
       isAnimating = true;
 
       const d = DESTINATIONS[nextIndex];
-      routeNumNxt.textContent = d.route;
       destNext.textContent    = d.destination;
       viaNext.textContent     = d.via;
-      slideNext.classList.toggle('not-in-service', d.route === '');
+      slideNext.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
 
       const enterClass = isClassic ? 'entering' : 'led-in';
       const leaveClass = isClassic ? 'leaving'  : 'led-strobe';
 
       // Make next visible at start position
-      slideNext.style.opacity   = '1';
-      routeNext.style.opacity   = '1';
+      slideNext.style.opacity = '1';
 
       // Trigger animations
       slideCurrent.classList.add(leaveClass);
       slideNext.classList.add(enterClass);
-      routeCurrent.classList.add(leaveClass);
-      routeNext.classList.add(enterClass);
 
       const duration = isClassic ? 300 : 340;
 
@@ -545,22 +457,18 @@
         // Swap: current becomes the new one
         currentIndex = nextIndex;
 
-        routeNumCur.textContent = d.route;
         destCurrent.textContent = d.destination;
         viaCurrent.textContent  = d.via;
-        slideCurrent.classList.toggle('not-in-service', d.route === '');
+        slideCurrent.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
 
         // Reset next to invisible / clean
         slideCurrent.classList.remove(leaveClass, enterClass);
         slideNext.classList.remove(leaveClass, enterClass);
-        routeCurrent.classList.remove(leaveClass, enterClass);
-        routeNext.classList.remove(leaveClass, enterClass);
 
         slideNext.style.opacity = '0';
-        routeNext.style.opacity = '0';
 
         posIndicator.textContent = `${currentIndex + 1} / ${DESTINATIONS.length}`;
-        liveRegion.textContent = `Route ${d.route || 'no route'}. ${d.destination}. ${d.via}`;
+        liveRegion.textContent = `${d.destination}. ${d.via}`;
         updateDots(currentIndex);
 
         isAnimating = false;
