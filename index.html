@@ -85,7 +85,6 @@
     }
 
     .mode-classic .route-number-box {
-      background: var(--blind-bg);
     }
 
     .mode-led .route-number-box {
@@ -112,22 +111,6 @@
       pointer-events: none;
     }
 
-    /* Fabric texture (classic only) */
-    .mode-classic .route-number-box::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(255,255,255,0.015) 3px,
-          rgba(255,255,255,0.015) 4px
-        );
-      z-index: 11;
-      pointer-events: none;
-    }
 
     .static-route-number {
       position: relative;
@@ -165,7 +148,6 @@
     }
 
     .intermediate-stops.mode-classic {
-      background: var(--blind-bg);
     }
 
     .intermediate-stops.mode-led {
@@ -192,22 +174,6 @@
       pointer-events: none;
     }
 
-    /* Fabric texture (classic only) */
-    .intermediate-stops.mode-classic::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(255,255,255,0.015) 3px,
-          rgba(255,255,255,0.015) 4px
-        );
-      z-index: 11;
-      pointer-events: none;
-    }
 
     .stops-list {
       position: relative;
@@ -256,7 +222,6 @@
 
     /* Classic mode */
     .blind-outer.mode-classic {
-      background: var(--blind-bg);
     }
 
     /* Vignette overlay */
@@ -274,22 +239,6 @@
       pointer-events: none;
     }
 
-    /* Fabric texture (classic only) */
-    .blind-outer.mode-classic::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(255,255,255,0.015) 3px,
-          rgba(255,255,255,0.015) 4px
-        );
-      z-index: 11;
-      pointer-events: none;
-    }
 
     /* LED mode background */
     .blind-outer.mode-led {
