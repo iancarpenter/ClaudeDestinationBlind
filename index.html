@@ -354,10 +354,7 @@
       font-size: clamp(0.4rem, 1.35vw, 0.95rem);
       font-weight: 400;
       color: var(--via-color);
-      margin-left: 0.6em;
-      align-self: flex-end;
-      padding-bottom: 0.15em;
-      text-align: left;
+      text-align: center;
       letter-spacing: 0.06em;
     }
 
@@ -379,10 +376,7 @@
       font-size: clamp(0.4rem, 1.35vw, 0.95rem);
       font-weight: 400;
       color: #cc6600;
-      margin-left: 0.6em;
-      align-self: flex-end;
-      padding-bottom: 0.15em;
-      text-align: left;
+      text-align: center;
       letter-spacing: 0.06em;
       text-shadow: 0 0 6px rgba(255,140,0,0.5);
     }
@@ -402,11 +396,18 @@
       width: 100%;
       height: 100%;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       position: absolute;
       will-change: transform, filter;
+    }
+
+    .dest-group {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.6em;
     }
 
     .slide-frame.entering {
@@ -582,12 +583,16 @@
       <div class="dest-area">
         <div class="slide-wrapper">
           <div class="slide-frame" id="slideCurrent">
-            <span class="destination-text" id="destCurrent"></span>
-            <span class="via-text" id="viaCurrent"></span>
+            <div class="dest-group">
+              <span class="destination-text" id="destCurrent"></span>
+              <span class="via-text" id="viaCurrent"></span>
+            </div>
           </div>
           <div class="slide-frame" id="slideNext" style="opacity:0">
-            <span class="destination-text" id="destNext"></span>
-            <span class="via-text" id="viaNext"></span>
+            <div class="dest-group">
+              <span class="destination-text" id="destNext"></span>
+              <span class="via-text" id="viaNext"></span>
+            </div>
           </div>
         </div>
         <div class="position-indicator" id="posIndicator"></div>
