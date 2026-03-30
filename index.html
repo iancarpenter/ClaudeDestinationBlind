@@ -486,33 +486,7 @@
     .btn:hover { background: var(--btn-hover); border-color: #666; }
     .btn:active { transform: scale(0.97); }
 
-    .btn-mode {
-      border-color: var(--accent);
-      color: #f88;
-    }
-    .btn-mode:hover { background: #3a1010; border-color: #ff4040; color: #fcc; }
-
     .btn-nav { font-size: 1.1rem; padding: 0.45rem 0.9rem; }
-
-    .progress-dots {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      align-items: center;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #444;
-      transition: background 300ms, transform 300ms;
-    }
-
-    .dot.active {
-      background: var(--accent);
-      transform: scale(1.4);
-    }
 
     /* ── Aria live ── */
     .sr-only {
@@ -583,9 +557,7 @@
   <!-- Controls -->
   <div class="controls">
     <button class="btn btn-nav" id="btnPrev" title="Next destination">&#8593;</button>
-    <div class="progress-dots" id="progressDots"></div>
-    <button class="btn btn-nav" id="btnNext" title="Previous destination">&#8595;</button>
-    <button class="btn btn-mode" id="btnMode">Switch to LED</button>
+<button class="btn btn-nav" id="btnNext" title="Previous destination">&#8595;</button>
   </div>
 
   </div><!-- /.main-wrapper -->
@@ -628,8 +600,7 @@
 
     /* ── State ── */
     let currentIndex = 0;
-    let isClassic = true;
-    let isAnimating = false;
+let isAnimating = false;
 
     /* ── DOM refs ── */
     const blindOuter          = document.getElementById('blindOuter');
@@ -644,9 +615,6 @@
     const liveRegion     = document.getElementById('liveRegion');
     const btnPrev        = document.getElementById('btnPrev');
     const btnNext        = document.getElementById('btnNext');
-    const btnMode        = document.getElementById('btnMode');
-    const progressDots   = document.getElementById('progressDots');
-
     /* ── Render static (no animation) ── */
     function renderStatic(index) {
       const d = DESTINATIONS[index];
@@ -654,7 +622,6 @@
       viaCurrent.textContent  = d.via;
       slideCurrent.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
       liveRegion.textContent = `${d.destination}. ${d.via}`;
-      updateDots(index);
     }
 
     /* ── Animate to next/prev ── */
@@ -668,10 +635,7 @@
       slideNext.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
 
       let enterClass, leaveClass;
-      if (!isClassic) {
-        enterClass = 'led-in';
-        leaveClass = 'led-strobe';
-      } else if (goingBack) {
+      if (goingBack) {
         enterClass = 'entering-reverse';
         leaveClass = 'leaving-reverse';
       } else {
@@ -686,7 +650,7 @@
       slideCurrent.classList.add(leaveClass);
       slideNext.classList.add(enterClass);
 
-      const duration = isClassic ? 300 : 340;
+      const duration = 300;
 
       setTimeout(() => {
         // Swap: current becomes the new one
@@ -703,7 +667,6 @@
         slideNext.style.opacity = '0';
 
         liveRegion.textContent = `${d.destination}. ${d.via}`;
-        updateDots(currentIndex);
 
         isAnimating = false;
       }, duration);
@@ -712,39 +675,9 @@
     function advance()  { animateTo((currentIndex + 1) % DESTINATIONS.length, false); }
     function retreat()  { animateTo((currentIndex - 1 + DESTINATIONS.length) % DESTINATIONS.length, true); }
 
-    /* ── Progress dots ── */
-    function buildDots() {
-      progressDots.innerHTML = '';
-      DESTINATIONS.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'dot' + (i === currentIndex ? ' active' : '');
-        dot.setAttribute('aria-hidden', 'true');
-        progressDots.appendChild(dot);
-      });
-    }
-
-    function updateDots(index) {
-      const dots = progressDots.querySelectorAll('.dot');
-      dots.forEach((d, i) => d.classList.toggle('active', i === index));
-    }
-
-    /* ── Mode toggle ── */
-    function setMode(classic) {
-      isClassic = classic;
-      blindOuter.classList.toggle('mode-classic', classic);
-      blindOuter.classList.toggle('mode-led', !classic);
-      routeNumberBox.classList.toggle('mode-classic', classic);
-      routeNumberBox.classList.toggle('mode-led', !classic);
-      intermediateStops.classList.toggle('mode-classic', classic);
-      intermediateStops.classList.toggle('mode-led', !classic);
-      btnMode.textContent = classic ? 'Switch to LED' : 'Switch to Classic';
-    }
-
     /* ── Event listeners ── */
     btnNext.addEventListener('click', () => { retreat(); });
     btnPrev.addEventListener('click', () => { advance(); });
-
-    btnMode.addEventListener('click', () => setMode(!isClassic));
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { advance(); }
@@ -785,7 +718,6 @@
     destArea.style.cursor = 'grab';
 
     /* ── Init ── */
-    buildDots();
     renderStatic(0);
   </script>
 
