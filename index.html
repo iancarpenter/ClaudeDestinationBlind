@@ -322,22 +322,6 @@
       padding: 0 4%;
     }
 
-    /* ── Position indicator ── */
-    .position-indicator {
-      position: absolute;
-      bottom: 6px;
-      right: 10px;
-      font-size: clamp(0.5rem, 1.2vw, 0.7rem);
-      color: rgba(255,255,255,0.25);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      z-index: 20;
-      font-family: 'Jost', monospace;
-    }
-
-    .mode-led .position-indicator {
-      color: rgba(255,140,0,0.2);
-    }
 
     /* ── CLASSIC TEXT ── */
     .mode-classic .destination-text {
@@ -542,13 +526,6 @@
       border: 0;
     }
 
-    /* ── Footer ── */
-    .footer {
-      color: #444;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
@@ -595,7 +572,6 @@
             </div>
           </div>
         </div>
-        <div class="position-indicator" id="posIndicator"></div>
       </div>
 
     </div>
@@ -617,7 +593,6 @@
   <!-- Accessible live region -->
   <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveRegion"></div>
 
-  <p class="footer">&#8593; &#8595; to step</p>
 
   <script>
     'use strict';
@@ -666,7 +641,6 @@
     const destNext       = document.getElementById('destNext');
     const viaCurrent     = document.getElementById('viaCurrent');
     const viaNext        = document.getElementById('viaNext');
-    const posIndicator   = document.getElementById('posIndicator');
     const liveRegion     = document.getElementById('liveRegion');
     const btnPrev        = document.getElementById('btnPrev');
     const btnNext        = document.getElementById('btnNext');
@@ -679,7 +653,6 @@
       destCurrent.textContent = d.destination;
       viaCurrent.textContent  = d.via;
       slideCurrent.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
-      posIndicator.textContent = `${index + 1} / ${DESTINATIONS.length}`;
       liveRegion.textContent = `${d.destination}. ${d.via}`;
       updateDots(index);
     }
@@ -729,7 +702,6 @@
 
         slideNext.style.opacity = '0';
 
-        posIndicator.textContent = `${currentIndex + 1} / ${DESTINATIONS.length}`;
         liveRegion.textContent = `${d.destination}. ${d.via}`;
         updateDots(currentIndex);
 
