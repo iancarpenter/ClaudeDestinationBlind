@@ -601,9 +601,9 @@
 
   <!-- Controls -->
   <div class="controls">
-    <button class="btn btn-nav" id="btnPrev" title="Previous destination">&#8593;</button>
+    <button class="btn btn-nav" id="btnPrev" title="Next destination">&#8593;</button>
     <div class="progress-dots" id="progressDots"></div>
-    <button class="btn btn-nav" id="btnNext" title="Next destination">&#8595;</button>
+    <button class="btn btn-nav" id="btnNext" title="Previous destination">&#8595;</button>
     <button class="btn btn-mode" id="btnMode">Switch to LED</button>
   </div>
 
@@ -764,8 +764,8 @@
     }
 
     /* ── Event listeners ── */
-    btnNext.addEventListener('click', () => { advance(); });
-    btnPrev.addEventListener('click', () => { retreat(); });
+    btnNext.addEventListener('click', () => { retreat(); });
+    btnPrev.addEventListener('click', () => { advance(); });
 
     btnMode.addEventListener('click', () => setMode(!isClassic));
 
