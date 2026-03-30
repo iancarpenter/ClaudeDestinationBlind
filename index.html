@@ -424,6 +424,17 @@
       from { transform: translateY(0);     filter: blur(0);   opacity: 1; }
       to   { transform: translateY(-100%); filter: blur(2px); opacity: 0.6; }
     }
+    @keyframes slideInReverse {
+      from { transform: translateY(-100%); filter: blur(2px); opacity: 0.6; }
+      to   { transform: translateY(0);     filter: blur(0);   opacity: 1; }
+    }
+    @keyframes slideOutReverse {
+      from { transform: translateY(0);    filter: blur(0);   opacity: 1; }
+      to   { transform: translateY(100%); filter: blur(2px); opacity: 0.6; }
+    }
+
+    .slide-frame.entering-reverse { animation: slideInReverse  300ms ease-out forwards; }
+    .slide-frame.leaving-reverse  { animation: slideOutReverse 300ms ease-in  forwards; }
 
     /* ── Strobe transition (LED) ── */
     .slide-frame.led-strobe {
@@ -669,7 +680,7 @@
     }
 
     /* ── Animate to next/prev ── */
-    function animateTo(nextIndex) {
+    function animateTo(nextIndex, goingBack = false) {
       if (isAnimating || nextIndex === currentIndex) return;
       isAnimating = true;
 
@@ -678,8 +689,17 @@
       viaNext.textContent     = d.via;
       slideNext.classList.toggle('not-in-service', d.destination === 'NOT IN SERVICE');
 
-      const enterClass = isClassic ? 'entering' : 'led-in';
-      const leaveClass = isClassic ? 'leaving'  : 'led-strobe';
+      let enterClass, leaveClass;
+      if (!isClassic) {
+        enterClass = 'led-in';
+        leaveClass = 'led-strobe';
+      } else if (goingBack) {
+        enterClass = 'entering-reverse';
+        leaveClass = 'leaving-reverse';
+      } else {
+        enterClass = 'entering';
+        leaveClass = 'leaving';
+      }
 
       // Make next visible at start position
       slideNext.style.opacity = '1';
@@ -712,8 +732,8 @@
       }, duration);
     }
 
-    function advance()  { animateTo((currentIndex + 1) % DESTINATIONS.length); }
-    function retreat()  { animateTo((currentIndex - 1 + DESTINATIONS.length) % DESTINATIONS.length); }
+    function advance()  { animateTo((currentIndex + 1) % DESTINATIONS.length, false); }
+    function retreat()  { animateTo((currentIndex - 1 + DESTINATIONS.length) % DESTINATIONS.length, true); }
 
     /* ── Progress dots ── */
     function buildDots() {
@@ -750,9 +770,42 @@
     btnMode.addEventListener('click', () => setMode(!isClassic));
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { advance(); }
-      if (e.key === 'ArrowLeft')  { retreat(); }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { advance(); }
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { retreat(); }
     });
+
+    /* ── Scroll / swipe / drag on dest-area ── */
+    const destArea = document.querySelector('.dest-area');
+
+    // Mouse wheel
+    destArea.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.deltaY > 0) advance(); else retreat();
+    }, { passive: false });
+
+    // Touch swipe
+    let touchStartY = null;
+    destArea.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    destArea.addEventListener('touchend', (e) => {
+      if (touchStartY === null) return;
+      const delta = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(delta) >= 40) { delta > 0 ? advance() : retreat(); }
+      touchStartY = null;
+    }, { passive: true });
+
+    // Click-drag
+    let dragStartY = null;
+    destArea.addEventListener('mousedown', (e) => { dragStartY = e.clientY; });
+    destArea.addEventListener('mouseup', (e) => {
+      if (dragStartY === null) return;
+      const delta = dragStartY - e.clientY;
+      if (Math.abs(delta) >= 40) { delta > 0 ? advance() : retreat(); }
+      dragStartY = null;
+    });
+    destArea.addEventListener('mouseleave', () => { dragStartY = null; });
+    destArea.style.cursor = 'grab';
 
     /* ── Init ── */
     buildDots();
