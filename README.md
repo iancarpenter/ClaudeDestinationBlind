@@ -8,17 +8,15 @@
 
 ## :bulb: About
 
-This is a single-file web app that recreates the destination blind found on London buses — the black-and-white mechanical roller blind and its modern amber LED matrix successor. Navigate 25 real London routes with keyboard, mouse wheel, touch swipe, or click-drag. No frameworks, no build step, just open `index.html`.
+This is a single-file web app that recreates the destination blind found on London buses — the black-and-white mechanical roller blind  Navigate real London destinations with keyboard, mouse wheel, touch swipe, or click-drag. No frameworks, no build step, just open `index.html`.
 
 ---
 
 ## :sparkles: Features
 
 - **Classic roller blind** — cream text on black, vignette shadow, authentic proportions
-- **LED matrix mode** — amber phosphor glow with stepped strobe-refresh animation
-- **25 real London routes** — including Night Bus (N prefix) and a "NOT IN SERVICE" entry
+- **London destinations** — including a "NOT IN SERVICE" entry
 - **Multi-input navigation** — ← → arrow keys, on-screen buttons, mouse wheel, touch swipe, click-drag
-- **Direction-aware animation** — forward slides up, backward slides down
 - **Accessible** — `aria-live` region announces each destination change for screen readers
 - **Responsive** — scales to any viewport at a fixed aspect ratio using `clamp()` fluid type
 - **Zero dependencies** — single HTML file, no npm, no build toolchain
@@ -27,22 +25,7 @@ This is a single-file web app that recreates the destination blind found on Lond
 
 ## :computer: Running locally
 
-No server needed — just open the file in any modern browser:
-
-```bash
-open index.html   # macOS
-start index.html  # Windows
-```
-
----
-
-## :rocket: Deploying to GitHub Pages
-
-1. Push this repo to GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Source**, choose **Deploy from a branch**.
-4. Select branch `main` and folder `/ (root)`, then click **Save**.
-5. Live at `https://<your-username>.github.io/<repo-name>/` within a minute.
+No server needed — just open the file in any modern browser
 
 ---
 
@@ -51,7 +34,7 @@ start index.html  # Windows
 Edit the `DESTINATIONS` array near the top of the `<script>` block in `index.html`:
 
 ```js
-{ route: '73', destination: 'VICTORIA COACH STATION', via: 'via Marble Arch, Hyde Park Corner' },
+{ route: '19', destination: 'Finsbury Park', via: '' },
 ```
 
 Set `route: ''` for a "NOT IN SERVICE" entry.
