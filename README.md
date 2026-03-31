@@ -1,33 +1,52 @@
 # London Bus Destination Blind
 
-A single-page web app that simulates a London bus destination blind — the classic roller blind (white text on black) and the modern LED matrix display.
+> A faithful browser simulation of the iconic London bus destination blind — classic roller and modern LED matrix, zero dependencies.
 
 ![screenshot](screenshot.png)
 
-## Features
+---
 
-- **Classic roller blind** — black background, white Jost/Gill Sans text, fabric texture, vignette edges
-- **LED matrix mode** — amber dot-matrix glow with strobe-refresh animation
-- **Auto-advance** — destinations cycle every 4 seconds; hover to pause
-- **Manual navigation** — ← → arrow keys or on-screen buttons
-- 13 real London routes including Night Bus (N prefix) and a "NOT IN SERVICE" entry
-- Responsive — scales to any screen size at a 16:5 aspect ratio
-- Accessible — `aria-live` region announces each destination change
-- Zero dependencies — single HTML file, no build step
+## :bulb: About
 
-## Running locally
+This is a single-file web app that recreates the destination blind found on London buses — the black-and-white mechanical roller blind and its modern amber LED matrix successor. Navigate 25 real London routes with keyboard, mouse wheel, touch swipe, or click-drag. No frameworks, no build step, just open `index.html`.
 
-Just open `index.html` in a browser. No server required.
+---
 
-## Deploying to GitHub Pages
+## :sparkles: Features
+
+- **Classic roller blind** — cream text on black, vignette shadow, authentic proportions
+- **LED matrix mode** — amber phosphor glow with stepped strobe-refresh animation
+- **25 real London routes** — including Night Bus (N prefix) and a "NOT IN SERVICE" entry
+- **Multi-input navigation** — ← → arrow keys, on-screen buttons, mouse wheel, touch swipe, click-drag
+- **Direction-aware animation** — forward slides up, backward slides down
+- **Accessible** — `aria-live` region announces each destination change for screen readers
+- **Responsive** — scales to any viewport at a fixed aspect ratio using `clamp()` fluid type
+- **Zero dependencies** — single HTML file, no npm, no build toolchain
+
+---
+
+## :computer: Running locally
+
+No server needed — just open the file in any modern browser:
+
+```bash
+open index.html   # macOS
+start index.html  # Windows
+```
+
+---
+
+## :rocket: Deploying to GitHub Pages
 
 1. Push this repo to GitHub.
 2. Go to **Settings → Pages**.
 3. Under **Source**, choose **Deploy from a branch**.
 4. Select branch `main` and folder `/ (root)`, then click **Save**.
-5. Your blind will be live at `https://<your-username>.github.io/<repo-name>/` within a minute.
+5. Live at `https://<your-username>.github.io/<repo-name>/` within a minute.
 
-## Customising destinations
+---
+
+## :wrench: Customising destinations
 
 Edit the `DESTINATIONS` array near the top of the `<script>` block in `index.html`:
 
@@ -37,6 +56,44 @@ Edit the `DESTINATIONS` array near the top of the `<script>` block in `index.htm
 
 Set `route: ''` for a "NOT IN SERVICE" entry.
 
-## Font
+---
 
-Uses [Jost](https://fonts.google.com/specimen/Jost) (Google Fonts) as the closest freely available substitute for New Johnston, TfL's official typeface. Falls back to Gill Sans, then system-ui.
+## :toolbox: Tech stack
+
+| Layer | Technology |
+|---|---|
+| Markup | HTML5 with semantic ARIA |
+| Styling | CSS3 — custom properties, `clamp()`, keyframe animations |
+| Logic | Vanilla ES6+ JavaScript |
+| Typography | [Jost](https://fonts.google.com/specimen/Jost) (Google Fonts) — closest free substitute for TfL's New Johnston |
+| Build | None — static single file |
+
+---
+
+## :art: Design notes
+
+<details>
+<summary>Typography</summary>
+
+TfL uses **New Johnston** as its official typeface, which is proprietary. This simulator substitutes [Jost](https://fonts.google.com/specimen/Jost), falling back to Gill Sans and system-ui.
+
+</details>
+
+<details>
+<summary>Animation system</summary>
+
+Two animation pairs handle direction-aware transitions:
+
+- **Forward** — destination exits upward (`leaving`), next enters from below (`entering`)
+- **Backward** — destination exits downward (`leaving-reverse`), previous enters from above (`entering-reverse`)
+
+LED mode replaces the slide with a `steps()` strobe effect to simulate matrix refresh.
+
+</details>
+
+<details>
+<summary>Accessibility</summary>
+
+An `aria-live="polite"` region outside the visual blind reads each new destination aloud to screen reader users without interrupting their flow.
+
+</details>
