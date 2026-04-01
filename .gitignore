@@ -1,1 +1,44 @@
+# ── Claude Code ──────────────────────────────────────────────────────────────
 .claude/settings.local.json
+.claude/todos.json
+
+# ── Windows ──────────────────────────────────────────────────────────────────
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── Editors & IDEs ───────────────────────────────────────────────────────────
+# VS Code
+.vscode/
+
+# JetBrains (WebStorm, IDEA, etc.)
+.idea/
+*.iml
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+Session.vim
+
+# Emacs
+*~
+\#*\#
+.#*
+
+# ── Future build tooling ──────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.cache/
+*.log
