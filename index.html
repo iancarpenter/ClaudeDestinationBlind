@@ -74,8 +74,9 @@
       width: 25%;
     }
 
-    /* Slide frames inside route-number-box must clear the vignette at z-index 10 */
-    .route-number-box .slide-frame {
+    /* Slide frames inside route-number-box and intermediate-stops must clear the vignette at z-index 10 */
+    .route-number-box .slide-frame,
+    .intermediate-stops .slide-frame {
       z-index: 12;
     }
 
@@ -528,13 +529,14 @@
       </div>
 
       <div class="intermediate-stops mode-classic" id="intermediateStops" aria-label="Intermediate stops">
-        <ul class="stops-list">
-          <li class="stop-item">Highbury Islington</li>
-          <li class="stop-item">Piccadilly Sloane Sq</li>
-          <li class="stop-item">Battersea Bridge</li>
-          <li class="stop-item">Clapham Junction</li>
-          
-        </ul>
+        <div class="slide-wrapper">
+          <div class="slide-frame" id="stopsSlideCurrent">
+            <ul class="stops-list" id="stopsCurrent"></ul>
+          </div>
+          <div class="slide-frame" id="stopsSlideNext" style="opacity:0">
+            <ul class="stops-list" id="stopsNext"></ul>
+          </div>
+        </div>
       </div>
 
     </div><!-- /.top-row -->
@@ -600,6 +602,20 @@
         </div>
       </div>
 
+      <div class="control-group">
+        <span class="group-label">Stops</span>
+        <div class="group-buttons">
+          <button class="btn btn-nav" id="btnStopsPrev" title="Previous stops">
+            <span class="btn-arrow">&#8593;</span>
+            <span class="btn-label">Prev</span>
+          </button>
+          <button class="btn btn-nav" id="btnStopsNext" title="Next stops">
+            <span class="btn-arrow">&#8595;</span>
+            <span class="btn-label">Next</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -645,11 +661,22 @@
     const ROUTES = ['4', '19'];
     const ROUTE_19_INDEX = ROUTES.indexOf('19');
 
+    /* ── Intermediate stops data ── */
+    const STOP_SETS = [
+      ['Highbury Islington', 'Islington Green', 'Angel', 'Kings Cross', 'Euston'],
+      ['Piccadilly Circus', 'Green Park', 'Hyde Park Corner', 'Knightsbridge', 'Sloane Sq'],
+      ['Sloane Square', 'Chelsea', 'Battersea Bridge', 'Battersea', 'Clapham Junction'],
+      ['Holloway Road', 'Highbury Corner', 'Islington', 'Clerkenwell', 'Holborn'],
+      ['Finsbury Park', 'Drayton Park', 'Highbury Barn', 'Canonbury', 'Islington'],
+    ];
+
     /* ── State ── */
     let currentIndex = 0;
     let isAnimating = false;
     let currentRouteIndex = ROUTE_19_INDEX;
     let isRouteAnimating = false;
+    let currentStopsIndex = 0;
+    let isStopsAnimating = false;
 
     /* ── DOM refs ── */
     const blindOuter          = document.getElementById('blindOuter');
@@ -670,6 +697,13 @@
     const btnNext        = document.getElementById('btnNext');
     const btnRoutePrev   = document.getElementById('btnRoutePrev');
     const btnRouteNext   = document.getElementById('btnRouteNext');
+    const stopsSlideCurrent = document.getElementById('stopsSlideCurrent');
+    const stopsSlideNext    = document.getElementById('stopsSlideNext');
+    const stopsCurrent      = document.getElementById('stopsCurrent');
+    const stopsNext         = document.getElementById('stopsNext');
+    const btnStopsPrev      = document.getElementById('btnStopsPrev');
+    const btnStopsNext      = document.getElementById('btnStopsNext');
+
     /* ── Render static (no animation) ── */
     function renderStatic(index) {
       const d = DESTINATIONS[index];
@@ -767,6 +801,55 @@
       animateRoute((currentRouteIndex - 1 + ROUTES.length) % ROUTES.length, true);
     }
 
+    /* ── Intermediate stops functions ── */
+    function populateStopsList(ulEl, stops) {
+      ulEl.innerHTML = '';
+      stops.forEach(stop => {
+        const li = document.createElement('li');
+        li.className = 'stop-item';
+        li.textContent = stop;
+        ulEl.appendChild(li);
+      });
+    }
+
+    function renderStopsStatic(index) {
+      populateStopsList(stopsCurrent, STOP_SETS[index]);
+    }
+
+    function animateStops(nextIndex, goingBack = false) {
+      if (isStopsAnimating || nextIndex === currentStopsIndex) return;
+      isStopsAnimating = true;
+
+      populateStopsList(stopsNext, STOP_SETS[nextIndex]);
+
+      const enterClass = goingBack ? 'entering-reverse' : 'entering';
+      const leaveClass = goingBack ? 'leaving-reverse'  : 'leaving';
+
+      stopsSlideNext.style.opacity = '1';
+      stopsSlideCurrent.classList.add(leaveClass);
+      stopsSlideNext.classList.add(enterClass);
+
+      setTimeout(() => {
+        currentStopsIndex = nextIndex;
+        populateStopsList(stopsCurrent, STOP_SETS[nextIndex]);
+
+        stopsSlideCurrent.classList.remove(leaveClass, enterClass);
+        stopsSlideNext.classList.remove(leaveClass, enterClass);
+        stopsSlideNext.style.opacity = '0';
+
+        liveRegion.textContent = `Stops: ${STOP_SETS[nextIndex].join(', ')}`;
+        isStopsAnimating = false;
+      }, 300);
+    }
+
+    function advanceStops() {
+      animateStops((currentStopsIndex + 1) % STOP_SETS.length, false);
+    }
+
+    function retreatStops() {
+      animateStops((currentStopsIndex - 1 + STOP_SETS.length) % STOP_SETS.length, true);
+    }
+
     /* ── Event listeners: destination ── */
     btnNext.addEventListener('click', () => { advance(); });
     btnPrev.addEventListener('click', () => { retreat(); });
@@ -774,6 +857,10 @@
     /* ── Event listeners: route number buttons ── */
     btnRoutePrev.addEventListener('click', () => { retreatRoute(); });
     btnRouteNext.addEventListener('click', () => { advanceRoute(); });
+
+    /* ── Event listeners: stops buttons ── */
+    btnStopsPrev.addEventListener('click', () => { retreatStops(); });
+    btnStopsNext.addEventListener('click', () => { advanceStops(); });
 
     /* ── Keyboard: Up/Down → destination, Left/Right → route ── */
     document.addEventListener('keydown', (e) => {
@@ -850,6 +937,7 @@
 
     /* ── Init ── */
     renderStatic(0);
+    renderStopsStatic(0);
   </script>
 
 </body>
