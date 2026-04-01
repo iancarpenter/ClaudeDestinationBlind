@@ -74,6 +74,11 @@
       width: 25%;
     }
 
+    /* Slide frames inside route-number-box must clear the vignette at z-index 10 */
+    .route-number-box .slide-frame {
+      z-index: 12;
+    }
+
     /* ── Route number box ── */
     .route-number-box {
       width: 100%;
@@ -511,7 +516,14 @@
 
       <div class="route-number-wrapper">
         <div class="route-number-box mode-classic" id="routeNumberBox" aria-label="Route 19">
-          <span class="static-route-number" id="routeNumber">19</span>
+          <div class="slide-wrapper">
+            <div class="slide-frame" id="routeSlideCurrent">
+              <span class="static-route-number" id="routeNumber">19</span>
+            </div>
+            <div class="slide-frame" id="routeSlideNext" style="opacity:0">
+              <span class="static-route-number" id="routeNumberNext"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -637,11 +649,15 @@
     let currentIndex = 0;
     let isAnimating = false;
     let currentRouteIndex = ROUTE_19_INDEX;
+    let isRouteAnimating = false;
 
     /* ── DOM refs ── */
     const blindOuter          = document.getElementById('blindOuter');
     const routeNumberBox      = document.getElementById('routeNumberBox');
     const routeNumber         = document.getElementById('routeNumber');
+    const routeNumberNext     = document.getElementById('routeNumberNext');
+    const routeSlideCurrent   = document.getElementById('routeSlideCurrent');
+    const routeSlideNext      = document.getElementById('routeSlideNext');
     const intermediateStops   = document.getElementById('intermediateStops');
     const slideCurrent   = document.getElementById('slideCurrent');
     const slideNext      = document.getElementById('slideNext');
@@ -715,21 +731,40 @@
     function retreat()  { animateTo((currentIndex - 1 + DESTINATIONS.length) % DESTINATIONS.length, true); }
 
     /* ── Route number functions ── */
-    function renderRoute(index) {
-      const r = ROUTES[index];
-      routeNumber.textContent = r;
-      routeNumberBox.setAttribute('aria-label', `Route ${r}`);
-      liveRegion.textContent = `Route ${r}`;
+    function animateRoute(nextIndex, goingBack = false) {
+      if (isRouteAnimating || nextIndex === currentRouteIndex) return;
+      isRouteAnimating = true;
+
+      const r = ROUTES[nextIndex];
+      routeNumberNext.textContent = r;
+
+      const enterClass = goingBack ? 'entering-reverse' : 'entering';
+      const leaveClass = goingBack ? 'leaving-reverse'  : 'leaving';
+
+      routeSlideNext.style.opacity = '1';
+      routeSlideCurrent.classList.add(leaveClass);
+      routeSlideNext.classList.add(enterClass);
+
+      setTimeout(() => {
+        currentRouteIndex = nextIndex;
+        routeNumber.textContent = r;
+        routeNumberBox.setAttribute('aria-label', `Route ${r}`);
+
+        routeSlideCurrent.classList.remove(leaveClass, enterClass);
+        routeSlideNext.classList.remove(leaveClass, enterClass);
+        routeSlideNext.style.opacity = '0';
+
+        liveRegion.textContent = `Route ${r}`;
+        isRouteAnimating = false;
+      }, 300);
     }
 
     function advanceRoute() {
-      currentRouteIndex = (currentRouteIndex + 1) % ROUTES.length;
-      renderRoute(currentRouteIndex);
+      animateRoute((currentRouteIndex + 1) % ROUTES.length, false);
     }
 
     function retreatRoute() {
-      currentRouteIndex = (currentRouteIndex - 1 + ROUTES.length) % ROUTES.length;
-      renderRoute(currentRouteIndex);
+      animateRoute((currentRouteIndex - 1 + ROUTES.length) % ROUTES.length, true);
     }
 
     /* ── Event listeners: destination ── */
