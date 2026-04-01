@@ -44,11 +44,11 @@
       text-transform: uppercase;
     }
 
-    /* ── Main wrapper (blind stack + controls side by side) ── */
+    /* ── Main wrapper (blind stack + controls stacked) ── */
     .main-wrapper {
       width: min(90vw, 860px);
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       gap: 0.75rem;
       align-items: stretch;
     }
@@ -69,19 +69,9 @@
       align-items: center;
     }
 
-    /* ── Route number wrapper (box + nav buttons) ── */
+    /* ── Route number wrapper ── */
     .route-number-wrapper {
       width: 25%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.3rem;
-    }
-
-    .btn-route-nav {
-      font-size: 0.85rem;
-      padding: 0.25rem 0.5rem;
-      width: 100%;
     }
 
     /* ── Route number box ── */
@@ -424,13 +414,46 @@
       text-shadow: none !important;
     }
 
-    /* ── Controls ── */
-    .controls {
+    /* ── Controls panel ── */
+    .controls-panel {
+      border: 1px solid var(--control-border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .controls-panel-label {
+      color: #888;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .control-groups {
+      display: flex;
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .group-label {
+      color: #666;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .group-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 0.4rem;
     }
 
     .btn {
@@ -451,7 +474,17 @@
     .btn:hover { background: var(--btn-hover); border-color: #666; }
     .btn:active { transform: scale(0.97); }
 
-    .btn-nav { font-size: 1.1rem; padding: 0.45rem 0.9rem; }
+    .btn-nav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      min-width: 3.5rem;
+      padding: 0.45rem 0.75rem;
+    }
+
+    .btn-arrow { font-size: 1.1rem; line-height: 1; }
+    .btn-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
 
     /* ── Aria live ── */
     .sr-only {
@@ -476,11 +509,9 @@
     <div class="top-row">
 
       <div class="route-number-wrapper">
-        <button class="btn btn-nav btn-route-nav" id="btnRoutePrev" title="Previous route">&#8593;</button>
         <div class="route-number-box mode-classic" id="routeNumberBox" aria-label="Route 19">
           <span class="static-route-number" id="routeNumber">19</span>
         </div>
-        <button class="btn btn-nav btn-route-nav" id="btnRouteNext" title="Next route">&#8595;</button>
       </div>
 
       <div class="intermediate-stops mode-classic" id="intermediateStops" aria-label="Intermediate stops">
@@ -524,9 +555,39 @@
   </div><!-- /.blind-stack -->
 
   <!-- Controls -->
-  <div class="controls">
-    <button class="btn btn-nav" id="btnPrev" title="Next destination">&#8593;</button>
-<button class="btn btn-nav" id="btnNext" title="Previous destination">&#8595;</button>
+  <div class="controls-panel">
+    <span class="controls-panel-label">Controls</span>
+    <div class="control-groups">
+
+      <div class="control-group">
+        <span class="group-label">Route</span>
+        <div class="group-buttons">
+          <button class="btn btn-nav" id="btnRoutePrev" title="Previous route">
+            <span class="btn-arrow">&#8593;</span>
+            <span class="btn-label">Prev</span>
+          </button>
+          <button class="btn btn-nav" id="btnRouteNext" title="Next route">
+            <span class="btn-arrow">&#8595;</span>
+            <span class="btn-label">Next</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="group-label">Destination</span>
+        <div class="group-buttons">
+          <button class="btn btn-nav" id="btnPrev" title="Previous destination">
+            <span class="btn-arrow">&#8593;</span>
+            <span class="btn-label">Prev</span>
+          </button>
+          <button class="btn btn-nav" id="btnNext" title="Next destination">
+            <span class="btn-arrow">&#8595;</span>
+            <span class="btn-label">Next</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   </div><!-- /.main-wrapper -->
