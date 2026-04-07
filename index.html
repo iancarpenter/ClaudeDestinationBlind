@@ -191,12 +191,15 @@
       position: relative;
       z-index: 12;
       list-style: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       padding: 0 4%;
-      gap: 0.15em;
+      gap: 0.15em 1em;
       width: 100%;
+    }
+
+    .stop-item:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
     }
 
     .stop-item {
@@ -589,20 +592,6 @@
       </div>
 
       <div class="control-group">
-        <span class="group-label">Destination</span>
-        <div class="group-buttons">
-          <button class="btn btn-nav" id="btnPrev" title="Previous destination">
-            <span class="btn-arrow">&#8593;</span>
-            <span class="btn-label">Prev</span>
-          </button>
-          <button class="btn btn-nav" id="btnNext" title="Next destination">
-            <span class="btn-arrow">&#8595;</span>
-            <span class="btn-label">Next</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="control-group">
         <span class="group-label">Stops</span>
         <div class="group-buttons">
           <button class="btn btn-nav" id="btnStopsPrev" title="Previous stops">
@@ -610,6 +599,20 @@
             <span class="btn-label">Prev</span>
           </button>
           <button class="btn btn-nav" id="btnStopsNext" title="Next stops">
+            <span class="btn-arrow">&#8595;</span>
+            <span class="btn-label">Next</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <span class="group-label">Destination</span>
+        <div class="group-buttons">
+          <button class="btn btn-nav" id="btnPrev" title="Previous destination">
+            <span class="btn-arrow">&#8593;</span>
+            <span class="btn-label">Prev</span>
+          </button>
+          <button class="btn btn-nav" id="btnNext" title="Next destination">
             <span class="btn-arrow">&#8595;</span>
             <span class="btn-label">Next</span>
           </button>
@@ -663,11 +666,7 @@
 
     /* ── Intermediate stops data ── */
     const STOP_SETS = [
-      ['Highbury Islington', 'Islington Green', 'Angel', 'Kings Cross', 'Euston'],
-      ['Piccadilly Circus', 'Green Park', 'Hyde Park Corner', 'Knightsbridge', 'Sloane Sq'],
-      ['Sloane Square', 'Chelsea', 'Battersea Bridge', 'Battersea', 'Clapham Junction'],
-      ['Holloway Road', 'Highbury Corner', 'Islington', 'Clerkenwell', 'Holborn'],
-      ['Finsbury Park', 'Drayton Park', 'Highbury Barn', 'Canonbury', 'Islington'],
+      ['Aldwych', 'Fleet Street', 'Barbican', 'Angel', 'Finsbury Park', 'Holloway', 'Tufnell Park Road'],      
     ];
 
     /* ── State ── */
