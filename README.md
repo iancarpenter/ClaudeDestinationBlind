@@ -1,6 +1,6 @@
 # London Bus Destination Blind
 
-> A faithful browser simulation of the iconic London bus destination blind — classic roller and modern LED matrix, zero dependencies.
+> A faithful browser simulation of the iconic London bus destination blind, zero dependencies.
 
 ![screenshot](screenshots/readme.png)
 
