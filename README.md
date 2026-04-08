@@ -70,8 +70,6 @@ Two animation pairs handle direction-aware transitions:
 - **Forward** — destination exits upward (`leaving`), next enters from below (`entering`)
 - **Backward** — destination exits downward (`leaving-reverse`), previous enters from above (`entering-reverse`)
 
-LED mode replaces the slide with a `steps()` strobe effect to simulate matrix refresh.
-
 </details>
 
 <details>
