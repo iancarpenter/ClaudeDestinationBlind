@@ -502,6 +502,32 @@
     .btn-arrow { font-size: 1.1rem; line-height: 1; }
     .btn-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
 
+    /* ── Controls panel — mobile ── */
+    @media (max-width: 500px) {
+      .controls-panel {
+        padding: 0.75rem;
+      }
+
+      .controls-panel-label {
+        text-align: center;
+      }
+
+      .control-groups {
+        flex-direction: column;
+        align-self: stretch;
+        gap: 0.75rem;
+      }
+
+      .group-buttons {
+        justify-content: center;
+      }
+
+      .btn-nav {
+        min-width: 5rem;
+        padding: 0.65rem 1rem;
+      }
+    }
+
     /* ── Aria live ── */
     .sr-only {
       position: absolute;
