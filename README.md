@@ -25,7 +25,7 @@ This is a single-file web app that recreates the destination blind found on Lond
 
 ## :computer: Running locally
 
-No server needed — just open the file in any modern browser
+No server needed — just open the file in any browser
 
 ---
 
